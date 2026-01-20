@@ -7,13 +7,31 @@ module datapath(
     output [4:0] ALUcontrol,
     output [31:0] x1, x2,x3, Mux1, Mux2, Mux3
 );
+wire [31:0] PCD, instrD, instr;
+    
+wire [31:0] PCE, rdE, rs1_dataE, rs2_dataE, imm_extE;
+wire [4:0]  rs1E, rs2E, alucontE;
+wire [2:0]  funct3E;
+wire        regwriteE, memwriteE, memtoregE, alusrcE;
+wire [5:0]  branchE;
+wire [1:0]  jE;
+    
+wire [31:0] PCM, rdM, rs2_dataM, ALU_outputM, result;
+wire [2:0]  funct3M;
+wire        regwriteM, memwriteM, memtoregM;
+wire [1:0]  jM;
+    
+wire [31:0] PCW, ALU_outputW, rDataW, rdW;
+wire        regwriteW, memtoregW;
+wire [1:0]  jW;
 
+
+// HAZARD UNIT 
 data_forwarding T1(.rs1_exe(rs1E),.rs2_exe(rs2E),.rd_mem(rdM),.rd_wb(rdW),.afwd(afwd),.bfwd(bfwd));
 interlock T2(.rs1_id(instrD[19:15]), .rs2_id(instrD[24:20]), .rd_exe(rdE),.MemRead_exe(memtoregE), .stall(stall));
 
 
 //Instruction FETCH
-wire [31:0] PCD, instrD,instr;
 
 rv32i_cpu u1(.CLK(clk),.reset(reset),.stall(stall),.a(jal),.b(jalr),.c(btaken),.in(Mux3),.PC(PC));
 memoryI u2(.Addr(PC), .rData(instruction));
@@ -21,12 +39,7 @@ mux3to1b m1(.a(btaken),.b(jE[1]),.c(jE[0]),.x1(instruction),.r(instr));
 IF_ID A1(.clk(clk),.reset(reset),.clear(),.enable(~stall),.PCF(PC),.instrF(instr),.PCD(PCD),.instrD(instrD));
 
 //Instruction DECODE
-wire [31:0] PCE,rdE,rs1_dataE,rs2_dataE,imm_extE;
-wire regwriteE, memwriteE, memtoregE, alusrcE;
-wire [4:0] alucontE,rs1E,rs2E;
-wire [5:0] branchE;
-wire [1:0] jE;
-wire [2:0] funct3E;
+
 regfile u3(.clk(clk),.we(regwriteW), .rs1(instrD[19:15]), .rs2(instrD[24:20]), .rd(rdW), .rd_data(Mux2), .rs1_data(rs1_data), .rs2_data(rs2_data), .x1(x1), .x2(x2), .x3(x3));
 signex u4(.instr(instrD),.PC(PCD),.imm_ext(imm_ext));
 maindec u5(.opcode(instrD[6:0]),.funct3(instrD[14:12]),.stall(stall),.btaken(btaken),.jE1(jE[1]),.jE2(jE[0]), .RegWrite(RegWrite),.memWrite(memWrite),.memtoReg(memtoReg),.ALUsrc(ALUsrc),.beq(beq),.bne(bne),.blt(blt),.bge(bge),.bltu(bltu),.bgeu(bgeu),.jal(jal),.jalr(jalr));
@@ -39,10 +52,7 @@ C_ID_EX B1(.clk(clk),.reset(reset),.enable(1),.clear(),.regwriteD(RegWrite), .me
            .regwriteE(regwriteE),.memwriteE(memwriteE),.memtoregE(memtoregE),.ALUsrcE(alusrcE),.ALUcontE(alucontE),.branchE(branchE),.jE(jE),.funct3E(funct3E));
 
 //Execution 
-wire [31:0]  PCM, rdM,rs2_dataM,ALU_outputM, result;
-wire regwriteM, memwriteM, memtoregM;
-wire [1:0] jM;
-wire [2:0] funct3M;
+
 mux3to1a m2(.a(afwd),.x1(ALU_outputM),.x2(Mux2),.x3(rs1_dataE),.r(result));
 alu u7(.a(result),.b(Mux1),.alucont(alucontE),.result(ALU_output),.N(N),.Z(Z),.C(C),.V(V));
 mux4to1 m3(.a(alusrcE),.b(bfwd),.x1(imm_extE),.x2(rs2_dataE),.x3(ALU_outputM),.x4(Mux2),.r(Mux1));
@@ -55,9 +65,7 @@ C_EX_MEM B2(.clk(clk),.reset(reset),.enable(1),.clear(),.regwriteE(regwriteE), .
            .regwriteM(regwriteM),.memwriteM(memwriteM),.memtoregM(memtoregM),.jM(jM),.funct3M(funct3M));
 
 //Memory Access
-wire [31:0] PCW,ALU_outputW,rDataW, rdW;
-wire regwriteW, memtoregW;
-wire [1:0] jW;
+
 memoryd u9(.Addr(ALU_outputM),.memwrite(memwriteM),.funct3(func3M),.clk(clk),.wData(rs2_dataM),.rData(rData));
 
 MEM_WB A4(.clk(clk),.reset(reset),.enable(1),.clear(),.PCM(PCM),.ALU_outputM(ALU_outputM),.rDataM(rData),.rdM(rdM),
@@ -67,6 +75,7 @@ C_MEM_WB B4(.clk(clk),.reset(reset),.enable(1),.clear(),.memwtoregM(memwtoregM),
 
 //WriteBack
 mux3to1 m5(.a(jW[1]),.b(jW[0]),.c(memtoregW),.x1(PCW+4),.x2(rDataW),.x3(ALU_outputW),.r(Mux2));
+
 
 
 endmodule
