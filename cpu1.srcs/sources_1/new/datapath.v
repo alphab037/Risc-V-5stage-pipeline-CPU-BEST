@@ -33,7 +33,7 @@ interlock T2(.rs1_id(instrD[19:15]), .rs2_id(instrD[24:20]), .rd_exe(rdE),.MemRe
 
 //Instruction FETCH
 
-rv32i_cpu u1(.CLK(clk),.reset(reset),.stall(stall),.a(jal),.b(jalr),.c(btaken),.in(Mux3),.PC(PC));
+    rv32i_cpu u1(.CLK(clk),.reset(reset),.stall(stall),.a(jE[1]),.b(jE[0]),.c(btaken),.in(Mux3),.PC(PC));
 memoryI u2(.Addr(PC), .rData(instruction));
 mux3to1b m1(.a(btaken),.b(jE[1]),.c(jE[0]),.x1(instruction),.r(instr));
 IF_ID A1(.clk(clk),.reset(reset),.clear(),.enable(~stall),.PCF(PC),.instrF(instr),.PCD(PCD),.instrD(instrD));
@@ -79,3 +79,4 @@ mux3to1 m5(.a(jW[1]),.b(jW[0]),.c(memtoregW),.x1(PCW+4),.x2(rDataW),.x3(ALU_outp
 
 
 endmodule
+
