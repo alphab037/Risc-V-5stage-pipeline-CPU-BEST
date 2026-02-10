@@ -2,8 +2,10 @@
 
 module EX_MEM(
     input clk,reset,enable,clear,
-    input [31:0] PCE,rdE, ALU_outputE, rs2_dataE,
-    output reg [31:0] PCM,rdM, ALU_outputM, rs2_dataM
+    input [31:0] PCE, ALU_outputE, rs2_dataE,
+    input [4:0] rdE,
+    output reg [4:0] rdM,
+    output reg [31:0] PCM,ALU_outputM, rs2_dataM
     );
 
 always @( posedge clk, posedge reset ) begin
