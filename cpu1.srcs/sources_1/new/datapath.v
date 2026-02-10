@@ -67,7 +67,7 @@ C_EX_MEM B2(.clk(clk),.reset(reset),.enable(1),.clear(),.regwriteE(regwriteE), .
 
 //Memory Access
 
-memoryd u9(.Addr(ALU_outputM),.memwrite(memwriteM),.funct3(func3M),.clk(clk),.wData(rs2_dataM),.rData(rData));
+    memoryd u9(.Addr(ALU_outputM),.memwrite(memwriteM),.funct3(funct3M),.clk(clk),.wData(rs2_dataM),.rData(rData));
 MEM_WB A4(.clk(clk),.reset(reset),.enable(1),.clear(),.PCM(PCM),.ALU_outputM(ALU_outputM),.rDataM(rData),.rdM(rdM),
          .PCW(PCW), .ALU_outputW(ALU_outputW),.rDataW(rDataW),.rdW(rdW));
 
@@ -80,5 +80,6 @@ mux3to1 m5(.a(jW[1]),.b(jW[0]),.c(memtoregW),.x1(PCW+4),.x2(rDataW),.x3(ALU_outp
 
 
 endmodule
+
 
 
