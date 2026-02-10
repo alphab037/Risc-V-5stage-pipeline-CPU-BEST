@@ -2,10 +2,10 @@
 
 module ID_EX(
     input clk,reset,enable,clear,
-    input [31:0] PCD, rdD,rs1_dataD,rs2_dataD, imm_extD,
-    input [4:0] rs1,rs2,
-    output reg [4:0] rs1E, rs2E,
-    output reg [31:0] PCE, rdE,rs1_dataE,rs2_dataE, imm_extE
+    input [31:0] PCD,rs1_dataD,rs2_dataD, imm_extD,
+    input [4:0] rdD, rs1,rs2,
+    output reg [4:0] rs1E, rs2E,rdE,
+    output reg [31:0] PCE, rs1_dataE,rs2_dataE, imm_extE
     );
 
 always @( posedge clk, posedge reset ) begin
