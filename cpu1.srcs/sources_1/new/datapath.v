@@ -9,19 +9,21 @@ module datapath(
 );
 wire [31:0] PCD, instrD, instr;
     
-wire [31:0] PCE, rdE, rs1_dataE, rs2_dataE, imm_extE;
-wire [4:0]  rs1E, rs2E, alucontE;
+wire [31:0] PCE,  rs1_dataE, rs2_dataE, imm_extE;
+wire [4:0]  rs1E, rs2E,rdE, alucontE;
 wire [2:0]  funct3E;
 wire        regwriteE, memwriteE, memtoregE, alusrcE;
 wire [5:0]  branchE;
 wire [1:0]  jE;
     
-wire [31:0] PCM, rdM, rs2_dataM, ALU_outputM, result;
+wire [31:0] PCM,  rs2_dataM, ALU_outputM, result;
+wire[4:0] rdM;
 wire [2:0]  funct3M;
 wire        regwriteM, memwriteM, memtoregM;
 wire [1:0]  jM;
     
-wire [31:0] PCW, ALU_outputW, rDataW, rdW;
+wire [31:0] PCW, ALU_outputW, rDataW;
+wire [4:0] rdW;
 wire        regwriteW, memtoregW;
 wire [1:0]  jW;
 
@@ -71,8 +73,8 @@ C_EX_MEM B2(.clk(clk),.reset(reset),.enable(1),.clear(),.regwriteE(regwriteE), .
 MEM_WB A4(.clk(clk),.reset(reset),.enable(1),.clear(),.PCM(PCM),.ALU_outputM(ALU_outputM),.rDataM(rData),.rdM(rdM),
          .PCW(PCW), .ALU_outputW(ALU_outputW),.rDataW(rDataW),.rdW(rdW));
 
-C_MEM_WB B4(.clk(clk),.reset(reset),.enable(1),.clear(),.memwtoregM(memwtoregM),.regwriteM(regwriteM),.jM(jM),
-           .memwtoregW(memwtoregW),.regwriteW(regwriteW),.jW(jW));
+C_MEM_WB B4(.clk(clk),.reset(reset),.enable(1),.clear(),.memwtoregM(memtoregM),.regwriteM(regwriteM),.jM(jM),
+           .memwtoregW(memtoregW),.regwriteW(regwriteW),.jW(jW));
 
 //WriteBack
 mux3to1 m5(.a(jW[1]),.b(jW[0]),.c(memtoregW),.x1(PCW+4),.x2(rDataW),.x3(ALU_outputW),.r(Mux2));
@@ -80,6 +82,5 @@ mux3to1 m5(.a(jW[1]),.b(jW[0]),.c(memtoregW),.x1(PCW+4),.x2(rDataW),.x3(ALU_outp
 
 
 endmodule
-
 
 
